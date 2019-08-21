@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Brad's Awesome Todo</title>
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+<span class="credit">Crafted by <a href="mailto:m.elkhoudary@gmail.com">Mohammed Riyad El Khoudary</a></span>
+<header>
+    <select id="selectedTodo">
+        <option value="Default">Default</option>
+    </select>
+    <button onclick="addTodoPanel();">&#xE145;</button>
+    <button onclick="removeTodoPanel();">&#xE15B;</button>
+    <input id="remoteAddress" type="text" placeholder="Remote storage id"/>
+</header>
+<h1><img height="35" src="https://image.ibb.co/eo4OKG/brad.jpg" alt=""/> <i class="material-icons flipped">&#xE244;</i>If
+    you're thinking that this tool will solve the problem, it means you're not really aware of what the problem is..<i
+            class="material-icons">&#xE244;</i> <em>Brad McEvoy. Circa 2018</em></h1>
+<section id="todo-list">
+    <ul class="pending-list todo-list" data-list-name="pending-list" title="Todays Todo">
+        <li class="input">
+            <input type="text" class="task-input" placeholder="What are you going to do?"/>
+        </li>
+    </ul>
+    <ul class="todo-list tomorrow-list" title="Tomorrows Todo" data-list-name="tomorrow-list">
+        <li class="input">
+            <input type="text" class="task-input" placeholder="What are you going to do?"/>
+        </li>
+    </ul>
+    <ul class="todo-list archive-list" title="Archive List" data-list-name="archive-list">
+    </ul>
+</section>
+<section>
+    <ul class="todo-list in-progress-list" title="In Progress List" data-list-name="in-progress-list">
+    </ul>
+    <ul class="todo-list done-list" title="Done List" data-list-name="done-list">
+    </ul>
+    <ul class="details-list" title="Relevant Details" data-list-name="details-list">
+        <li class="input">
+            <input type="text" class="task-input"
+                   placeholder="Please Enter whatever relevant details needed down here"/>
+        </li>
+    </ul>
+    <ul class="todo-list pool-list" title="Less Priority Todo" data-list-name="pool-list">
+        <li class="input">
+            <input type="text" class="task-input" placeholder="What are you going to do?"/>
+        </li>
+    </ul>
+    <ul class="todo-list repeatable-list" title="Repeatable Todo" data-list-name="repeatable-list">
+        <li class="input">
+            <input type="text" class="task-input" placeholder="What are you going to do?"/>
+        </li>
+    </ul>
+</section>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.6.1/jquery.timeago.min.js"
+        type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/localStorage/2.0.1/localStorage.min.js"
+        type="text/javascript"></script>
+<!-- partial -->
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js'></script>
+<script src="./script.js"></script>
+</body>
+</html>

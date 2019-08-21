@@ -1,0 +1,243 @@
+*,
+*:before,
+*:after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.credit {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 70%;
+  color: #afafaf;
+  font-style: italic;
+}
+.credit a {
+  color: #efefef;
+  text-decoration: none;
+}
+header {
+  width: 100%;
+  background-color: #24292e;
+  line-height: 35px;
+  height: 40px;
+  padding: 0 8px;
+}
+header * {
+  vertical-align: middle;
+}
+header select,
+header input {
+  display: inline-block;
+  background-color: rgba(255, 255, 255, 0.125);
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  height: 22px;
+  width: 180px;
+  outline: none;
+  padding: 3px;
+}
+header select option,
+header input option {
+  color: black;
+}
+header button {
+  display: inline-block;
+  font-family: 'Material Icons';
+  background-color: rgba(255, 255, 255, 0.125);
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  height: 22px;
+  width: 22px;
+  font-size: 110%;
+  outline: none;
+}
+header button:active {
+  background-color: rgba(255, 255, 255, 0.085);
+  color: rgba(255, 255, 255, 0.45);
+}
+body::-webkit-scrollbar {
+  width: 8px;
+}
+body::-webkit-scrollbar-track {
+  background: #b2b2b2;
+}
+body::-webkit-scrollbar-thumb {
+  background: #464646;
+}
+body {
+  padding: 0;
+  font-family: arial;
+}
+h1 {
+  font-size: 120%;
+  text-align: center;
+  color: gray;
+  margin-bottom: 10px;
+}
+h1 em {
+  font-weight: normal;
+  font-size: 80%;
+}
+section {
+  width: 50%;
+  float: left;
+  padding: 5px;
+}
+.start-time:before {
+  content: "Added : ";
+  color: black;
+}
+img {
+  display: inline-block;
+  position: relative;
+  top: 8px;
+}
+.flipped {
+  -moz-transform: scaleX(-1);
+  -o-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
+  filter: FlipH;
+  -ms-filter: "FlipH";
+}
+.started-time {
+  margin-right: 10px;
+}
+.started-time:before {
+  content: "Started : ";
+  color: black;
+}
+.done-time {
+  margin-right: 10px;
+}
+.done-time:before {
+  content: "Done : ";
+  color: black;
+}
+.in-progress-list {
+  min-height: auto !important;
+}
+.in-progress-list .start-time {
+  display: none;
+}
+.in-progress-list li {
+  background-color: lightblue !important;
+}
+.hidden {
+  display: none !important;
+}
+.done-list .started-time ~ .start-time {
+  display: none;
+}
+.done-list li {
+  background-color: lightgreen !important;
+}
+.done-list li span {
+  width: 50%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.pool-list .started-time,
+.tomorrow-list .started-time {
+  display: none;
+}
+.archive-list .started-time {
+  display: none;
+}
+.archive-list li {
+  background-color: lightyellow !important;
+}
+.archive-list li span {
+  width: 50%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.todo-list,
+.details-list {
+  width: 100%;
+  padding: 0;
+  list-style: none;
+  float: left;
+  min-height: 200px;
+  border: 1px solid #afafaf;
+  padding: 10px;
+  padding-top: 20px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  position: relative;
+}
+.todo-list:before,
+.details-list:before {
+  content: attr(title);
+  display: block;
+  text-align: center;
+  position: relative;
+  top: -10px;
+  font-size: 70%;
+  color: gray;
+}
+.todo-list button,
+.details-list button {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+}
+.todo-list li,
+.details-list li {
+  width: 100%;
+  position: relative;
+  min-height: 30px;
+}
+.todo-list li:not(.input),
+.details-list li:not(.input) {
+  padding: 7px;
+  background-color: #cfcfcf;
+  margin-top: 3px;
+  border-radius: 5px;
+}
+.todo-list li:not(.input) time,
+.details-list li:not(.input) time {
+  float: right;
+  font-size: 70%;
+  color: gray;
+}
+.todo-list li:not(.input) i,
+.details-list li:not(.input) i {
+  display: inline-block;
+  margin-left: 5px;
+  margin-right: 5px;
+  position: relative;
+  z-index: 2;
+}
+.todo-list li:not(.input) span,
+.details-list li:not(.input) span {
+  position: absolute;
+  cursor: pointer;
+  font-size: 85%;
+}
+.todo-list li:not(.input) i,
+.details-list li:not(.input) i {
+  float: right;
+}
+.todo-list li select,
+.details-list li select,
+.todo-list li input,
+.details-list li input {
+  display: block;
+  width: 100%;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid silver;
+  outline: none;
+  transition: border-color 500ms;
+}
+.todo-list li select:focus,
+.details-list li select:focus,
+.todo-list li input:focus,
+.details-list li input:focus {
+  border-color: gray;
+}
