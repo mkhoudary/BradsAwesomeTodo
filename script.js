@@ -97,7 +97,7 @@ $(document).ready(function () {
     $("body").on("click", ".editable", function () {
         var editable = $(this);
         var value = editable.text();
-        editable.addClass('hidden');
+        editable.parent().find(":not(input)").addClass('hidden');
         var editableInput = '<input class="editable-input" value="' + value + '">';
         editable.after(editableInput);
     });
@@ -109,7 +109,7 @@ $(document).ready(function () {
             var changedValue = container.val();
             var editable = container.parent().find('.editable');
             editable.text(changedValue);
-            editable.removeClass('hidden');
+            editable.parent().find(":not(input)").removeClass('hidden');
             container.remove();
             saveDetails();
         }
