@@ -144,6 +144,7 @@ $(document).ready(function () {
         if (hour > -1 && minute > -1) {
             today.setHours(hour);
             today.setMinutes(minute);
+            today.setSeconds(0);
         }
         let dateNum = getDay(taskText);
         today.setDate(dateNum);
@@ -256,7 +257,7 @@ function saveDetails() {
                 endTime: $(this).find(".done-time").attr("datetime"),
                 startedTime: $(this).find(".started-time").attr("datetime"),
                 startDate: $(this).find(".start-date").attr("datetime"),
-                taskTime: $(this).find(".task-time").attr("datetime"),
+                taskTime: $(this).find(".task-time").attr("datetime")
             };
         });
 
@@ -343,6 +344,13 @@ function get_time_diff(datetime) {
     return days;
 }
 
+function hasPassed(datetime) {
+    datetime = typeof datetime !== 'undefined' ? datetime : "2014-01-01 01:02:03.123456";
+    datetime = new Date(datetime).getTime();
+    let now = new Date().getTime();
+    return now > datetime;
+}
+
 function cleanTaskTitle(title) {
     let chunks = title.split(" ");
     let weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -388,11 +396,14 @@ function reloadSelectedTodo(externalContent) {
                 let endTime = (item.endTime !== 'undefined' && item.endTime !== undefined ? ('<time class="timeago done-time" datetime="' + item.endTime + '"></time>') : '');
                 let startedTime = (item.startedTime !== 'undefined' && item.startedTime !== undefined ? ('<time class="timeago started-time" datetime="' + item.startedTime + '"></time>') : '');
                 let startDate = (item.startDate !== 'undefined' && item.startDate !== undefined ? ('<time class="timeago start-date" datetime="' + item.startDate + '"></time>') : '');
-                let time = (item.taskTime !== 'undefined' && item.taskTime !== undefined ? (`<time class="task-time" style="font-size:14px; color: red" datetime="${item.taskTime}">${item.taskTime}</time>`) : '');
                 let title = item.title !== 'undefined' && item.title !== undefined ? cleanTaskTitle(item.title) : '';
+
 
                 let spanItem = `<span class="editable">${title}</span>`;
                 let dayDifference = get_time_diff(item.startDate);
+                let timeColor = hasPassed(item.startDate) ? 'red' : 'green';
+                let time = (item.taskTime !== 'undefined' && item.taskTime !== undefined ? (`<time class="task-time" style="font-size:14px; color: ${timeColor}" datetime="${item.taskTime}">${item.taskTime}</time>`) : '');
+
                 let listItem = '<li>'
                     + time
                     + spanItem
