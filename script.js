@@ -123,60 +123,79 @@ $(document).ready(function () {
         editable.after(editableInput);
     });
 
-    var getStartDate = function (taskText) {
-        const today = new Date();
-        var chunks = taskText.split(" ");
-        for (var i = 0; i < chunks.length; i++) {
-            var chunk = chunks[i];
+    function getTime(taskText) {
+        let chunks = taskText.split(" ");
+        let hour, minute = -1;
+        for (let i = 0; i < chunks.length; i++) {
+            let chunk = chunks[i];
             //13:00 or 1:00 or 5:05 or 5:5
             if (chunk.match("^([0-9]|0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]|1[0-5]|[0-9])$")) {
-                var chunkSplits = chunk.split(":");
-                today.setHours(parseInt(chunkSplits[0]));
-                today.setMinutes(parseInt(chunkSplits[1]));
+                let chunkSplits = chunk.split(":");
+                hour = (parseInt(chunkSplits[0]));
+                minute = (parseInt(chunkSplits[1]));
             }
         }
-        var dateNum = getDay(taskText);
+        return {hour: hour, minute: minute};
+    }
+
+    function getStartDate(taskText) {
+        const today = new Date();
+        const {hour, minute} = getTime(taskText);
+        if (hour > -1 && minute > -1) {
+            today.setHours(hour);
+            today.setMinutes(minute);
+        }
+        let dateNum = getDay(taskText);
         today.setDate(dateNum);
         return today;
-    };
+    }
 
-    var getDay = function (taskText) {
-        var d = new Date();
-        var chunks = taskText.split(" ");
-        var weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        for (var i = 0; i < chunks.length; i++) {
-            var chunk = chunks[i].toLowerCase();
-            for (var j = 0; j < weekDays.length; j++) {
-                var day = weekDays[j].toLowerCase();
+    function getDay(taskText) {
+        let d = new Date();
+        let chunks = taskText.split(" ");
+        let weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        for (let i = 0; i < chunks.length; i++) {
+            let chunk = chunks[i].toLowerCase();
+            for (let j = 0; j < weekDays.length; j++) {
+                let day = weekDays[j].toLowerCase();
                 if (chunk === day || chunk === day.substring(0, 3) || chunk === day.substring(0, 4)) {
-
                     return d.getDate() + (7 + j - d.getDay()) % 7;
                 }
             }
         }
         return d.getDate();
-    };
+    }
+
     //Detect Task Text Changed
     var detectEditableInputChange = function (event) {
-        var container = $("input.editable-input");
+        let container = $("input.editable-input");
         if (!container.is(event.target) && container.has(event.target).length === 0 && container.is(":visible")) {
-            var changedValue = container.val();
-            var editable = container.parent().find('.editable');
+            let changedValue = container.val();
+            let editable = container.parent().find('.editable');
             if (changedValue != null && changedValue != '') {
                 editable.text(changedValue);
-                var startDate = getStartDate(changedValue);
-
+                let startDate = getStartDate(changedValue);
+                let time = '';
+                const {hour, minute} = getTime(changedValue);
+                if (hour > -1 && minute > -1) {
+                    const tempDate = new Date();
+                    tempDate.setHours(hour);
+                    tempDate.setMinutes(minute);
+                    time = tempDate.toLocaleTimeString('en-US');
+                    time = time.split(':');
+                    time = `${time[0]}:${time[1]} ${time[2].split(" ")[1]}`;
+                    time = `<time class="task-time" datetime="${time}"></time>`;
+                }
 
                 if (!isNaN(startDate.getDay())) {
                     editable.parent().find('.start-date').remove();
-                    editable.after('<time class="timeago start-date" datetime="' + startDate.toISOString() + '"></time>');
+                    editable.after(`<time class="timeago start-date" datetime="${startDate.toISOString()}"></time>${time}`);
                 }
             }
             editable.parent().find(":not(input)").removeClass('hidden');
             container.remove();
             saveDetails();
             reloadSelectedTodo();
-
         }
     };
     $('body').on('mouseup keypress', function (event) {
@@ -189,8 +208,21 @@ $(document).ready(function () {
             }
             let value = $(this).val();
             let startDate = getStartDate(value);
+            const {hour, minute} = getTime(value);
+
+            let time = '';
+            if (hour > -1 && minute > -1) {
+                const tempDate = new Date();
+                tempDate.setHours(hour);
+                tempDate.setMinutes(minute);
+                time = tempDate.toLocaleTimeString('en-US');
+                time = time.split(':');
+                time = `${time[0]}:${time[1]} ${time[2].split(" ")[1]}`;
+                time = `<time class="task-time" datetime="${time}"></time>`;
+            }
             startDate = startDate !== undefined && !isNaN(startDate.getDate()) ? `<time class="timeago start-date" datetime="${startDate.toISOString()}"></time>` : '';
             $(this).parents("li").after('<li>'
+                + time
                 + `<span class="editable">${value}</span>`
                 + `<time class="timeago start-time" datetime="${new Date().toISOString()}"></time>`
                 + startDate
@@ -215,12 +247,14 @@ function saveDetails() {
         var listData = [];
 
         $(this).find("li:not(.input)").each(function () {
+
             listData[listData.length] = {
-                title: $(this).find("span").text(),
+                title: $(this).find("span.editable").text(),
                 createdTime: $(this).find(".start-time").attr("datetime"),
                 endTime: $(this).find(".done-time").attr("datetime"),
                 startedTime: $(this).find(".started-time").attr("datetime"),
                 startDate: $(this).find(".start-date").attr("datetime"),
+                taskTime: $(this).find(".task-time").attr("datetime"),
             };
         });
 
@@ -332,23 +366,20 @@ function reloadSelectedTodo(externalContent) {
                 let endTime = (item.endTime !== 'undefined' && item.endTime !== undefined ? ('<time class="timeago done-time" datetime="' + item.endTime + '"></time>') : '');
                 let startedTime = (item.startedTime !== 'undefined' && item.startedTime !== undefined ? ('<time class="timeago started-time" datetime="' + item.startedTime + '"></time>') : '');
                 let startDate = (item.startDate !== 'undefined' && item.startDate !== undefined ? ('<time class="timeago start-date" datetime="' + item.startDate + '"></time>') : '');
-                let spanItem =
+                let time = (item.taskTime !== 'undefined' && item.taskTime !== undefined ? (`<time class="task-time" style="font-size:14px; color: red" datetime="${item.taskTime}">${item.taskTime}</time>`) : '');
 
-                    `<span class="editable">${item.title}</span>`;
+
+                let spanItem = `<span class="editable">${item.title}</span>`;
                 let dayDifference = get_time_diff(item.startDate);
                 let listItem = '<li>'
+                    + time
                     + spanItem
-                    + `
-
-<time class="timeago start-time" datetime="$
-    {
-        item.createdTime
-    }
-"></time>`
+                    + `<time class="timeago start-time" datetime="${item.createdTime}"></time>`
                     + (endTime !== "" ? endTime : startedTime)
                     + startDate
                     + ($("." + listId).hasClass("details-list") || $("." + listId).hasClass("archive-list") ? '' : '<i class="fa fa-archive" onclick="archiveParent(event);"></i>')
-                    + '<i class="fa fa-trash-o" onclick="removeParent(event);"></i></li>';
+                    + '<i class="fa fa-trash-o" onclick="removeParent(event);"></i>'
+                    + '</li>';
 
 
                 if (dayDifference === 1) {
@@ -361,8 +392,7 @@ function reloadSelectedTodo(externalContent) {
                     $("." + listId).append(listItem);
                 }
             });
-        })
-        ;
+        });
 
         $("time.timeago").timeago();
     }

@@ -85,10 +85,7 @@ section {
   float: left;
   padding: 5px;
 }
-.start-time:before {
-  content: " Added : ";
-  color: black;
-}
+
 img {
   display: inline-block;
   position: relative;
@@ -104,6 +101,10 @@ img {
 }
 .started-time {
   margin-right: 10px;
+}
+.start-time:before {
+  content: "Added: ";
+  color: black;
 }
 .started-time:before {
   content: " Started : ";
