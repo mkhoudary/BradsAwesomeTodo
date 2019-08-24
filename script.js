@@ -1,3 +1,5 @@
+jQuery.timeago.settings.allowFuture = true;
+
 String.prototype.toDash = function () {
     return this.replace(/([A-Z])/g, function ($1) {
         return "-" + $1.toLowerCase();
@@ -22,6 +24,7 @@ $(document).ready(function () {
         'connectWith': '.todo-list',
         receive: function (event, ui) {
             ui.item.find(".done-time").remove();
+            ui.item.find(".start-date").remove();
 
             saveDetails();
         },
@@ -37,6 +40,7 @@ $(document).ready(function () {
                 ui.item.find("time:last-of-type").after('<time class="timeago done-time" datetime="' + new Date().toISOString() + '"></time>');
                 $("time.timeago").timeago();
             }
+            ui.item.find(".start-date").remove();
 
             saveDetails();
         },
@@ -48,6 +52,7 @@ $(document).ready(function () {
     $(".archive-list").sortable({
         'connectWith': '.todo-list',
         receive: function (event, ui) {
+            ui.item.find(".start-date").remove();
             saveDetails();
         },
         stop: function () {
@@ -58,6 +63,7 @@ $(document).ready(function () {
     $(".tomorrow-list").sortable({
         'connectWith': '.todo-list',
         receive: function (event, ui) {
+            ui.item.find(".start-date").remove();
             ui.item.find(".done-time").remove();
 
             saveDetails();
@@ -77,10 +83,25 @@ $(document).ready(function () {
         }
     });
 
+    $(".upcoming-list").sortable({
+        'connectWith': '.todo-list',
+        receive: function (event, ui) {
+            ui.item.find(".done-time").remove();
+            ui.item.find(".start-date").remove();
+
+            saveDetails();
+        },
+        stop: function () {
+            saveDetails();
+        }
+    });
+
+
     $(".in-progress-list").sortable({
         'connectWith': '.todo-list',
         receive: function (event, ui) {
             ui.item.find(".done-time, .started-time").remove();
+            ui.item.find(".start-date").remove();
 
             ui.item.find("time:first-of-type").before('<time class="timeago started-time" datetime="' + new Date().toISOString() + '"></time>');
             $("time.timeago").timeago();
@@ -102,16 +123,6 @@ $(document).ready(function () {
         editable.after(editableInput);
     });
 
-    function getre(str, num) {
-        if (str === num) return 'nice try';
-        var res = [/^\D+/g, /\D+$/g, /^\D+|\D+$/g, /\D+/g, /\D.*/g, /.*\D/g, /^\D+|\D.*$/g, /.*\D(?=\d)|\D+$/g];
-        for (var i = 0; i < res.length; i++)
-            if (str.replace(res[i], '') === num)
-                return 'num = str.replace(/' + res[i].source + '/g, "")';
-        return 'no idea';
-    }
-
-
     var getStartDate = function (taskText) {
         const today = new Date();
         var chunks = taskText.split(" ");
@@ -128,19 +139,22 @@ $(document).ready(function () {
         today.setDate(dateNum);
         return today;
     };
+
     var getDay = function (taskText) {
+        var d = new Date();
         var chunks = taskText.split(" ");
         var weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         for (var i = 0; i < chunks.length; i++) {
-            var chunk = chunks[i];
+            var chunk = chunks[i].toLowerCase();
             for (var j = 0; j < weekDays.length; j++) {
-                var day = weekDays[j];
+                var day = weekDays[j].toLowerCase();
                 if (chunk === day || chunk === day.substring(0, 3) || chunk === day.substring(0, 4)) {
-                    var d = new Date();
+
                     return d.getDate() + (7 + j - d.getDay()) % 7;
                 }
             }
         }
+        return d.getDate();
     };
     //Detect Task Text Changed
     var detectEditableInputChange = function (event) {
@@ -151,6 +165,8 @@ $(document).ready(function () {
             if (changedValue != null && changedValue != '') {
                 editable.text(changedValue);
                 var startDate = getStartDate(changedValue);
+
+
                 if (!isNaN(startDate.getDay())) {
                     editable.parent().find('.start-date').remove();
                     editable.after('<time class="timeago start-date" datetime="' + startDate.toISOString() + '"></time>');
@@ -159,28 +175,33 @@ $(document).ready(function () {
             editable.parent().find(":not(input)").removeClass('hidden');
             container.remove();
             saveDetails();
+            reloadSelectedTodo();
+
         }
     };
     $('body').on('mouseup keypress', function (event) {
-        if (event.type == 'mouseup') detectEditableInputChange(event);
-        else if (event.type == 'keypress' && event.which == 13) {
-            detectEditableInputChange(event);
-        }
+        if (event.type == 'mouseup' || event.type == 'keypress' && event.which == 13) detectEditableInputChange(event);
     });
 
     $(".task-input").on("keydown", function (event) {
-        if (event.keyCode !== 13) {
-            return;
+            if (event.keyCode !== 13) {
+                return;
+            }
+            let value = $(this).val();
+            let startDate = getStartDate(value);
+            startDate = startDate !== undefined && !isNaN(startDate.getDate()) ? `<time class="timeago start-date" datetime="${startDate.toISOString()}"></time>` : '';
+            $(this).parents("li").after('<li>'
+                + `<span class="editable">${value}</span>`
+                + `<time class="timeago start-time" datetime="${new Date().toISOString()}"></time>`
+                + startDate
+                + ($(this).parents("ul").hasClass("details-list") || $(this).parents("ul").hasClass("archive-list") ? '' : '<i class="fa fa-archive" onclick="archiveParent(event);"></i>')
+                + '<i class="fa fa-trash-o" onclick="removeParent(event);"></i></li>');
+            $("time.timeago").timeago();
+            $(this).val("");
+            saveDetails();
+            reloadSelectedTodo();
         }
-
-        $(this).parents("li").after('<li><span class="editable">' + $(this).val() + '</span><time class="timeago start-time" datetime="' + new Date().toISOString() + '"></time>' + ($(this).parents("ul").hasClass("details-list") || $(this).parents("ul").hasClass("archive-list") ? '' : '<i class="fa fa-archive" onclick="archiveParent(event);"></i>') + '<i class="fa fa-trash-o" onclick="removeParent(event);"></i></li>');
-
-        $("time.timeago").timeago();
-
-        $(this).val("");
-
-        saveDetails();
-    })
+    )
 });
 
 function saveDetails() {
@@ -266,6 +287,26 @@ function saveTodos() {
     window.localStorage.setItem('todos', JSON.stringify(todos));
 }
 
+function get_time_diff(datetime) {
+    let days = 0;
+    if (datetime !== undefined) {
+        datetime = typeof datetime !== 'undefined' ? datetime : "2014-01-01 01:02:03.123456";
+        datetime = new Date(datetime).getTime();
+        let now = new Date().getTime();
+        if (isNaN(datetime)) {
+            return "";
+        }
+        let milisec_diff = datetime - now;
+        if (datetime < now) {
+            milisec_diff = now - datetime;
+        }
+        days = Math.floor(milisec_diff / 1000 / 60 / (60 * 24));
+        let hours = Math.round(milisec_diff / 1000 / 60 / (60));
+        days = days === 0 && hours === 24 ? 1 : days;
+    }
+    return days;
+}
+
 function reloadSelectedTodo(externalContent) {
     $(".todo-list li:not(.input), .details-list li:not(.input)").remove();
 
@@ -288,17 +329,40 @@ function reloadSelectedTodo(externalContent) {
 
         $.each(memoryItems, function (listId, list) {
             $.each(list, function (key, item) {
-                var endTime = (item.endTime !== 'undefined' && item.endTime !== undefined ? ('<time class="timeago done-time" datetime="' + item.endTime + '"></time>') : '');
-                var startedTime = (item.startedTime !== 'undefined' && item.startedTime !== undefined ? ('<time class="timeago started-time" datetime="' + item.startedTime + '"></time>') : '');
-                var spanItem = '<span class="editable">' + item.title + '</span>';
-                //
-                // + '<time class="timeago start-time" datetime="' + item.startDate + '"></time>'
-                // + (startDate)
-                // + '</time>'
-                var listItem = '<li>' + spanItem + '<time class="timeago start-time" datetime="' + item.createdTime + '"></time>' + (endTime !== "" ? endTime : startedTime) + ($("." + listId).hasClass("details-list") || $("." + listId).hasClass("archive-list") ? '' : '<i class="fa fa-archive" onclick="archiveParent(event);"></i>') + '<i class="fa fa-trash-o" onclick="removeParent(event);"></i></li>';
-                $("." + listId).append(listItem);
+                let endTime = (item.endTime !== 'undefined' && item.endTime !== undefined ? ('<time class="timeago done-time" datetime="' + item.endTime + '"></time>') : '');
+                let startedTime = (item.startedTime !== 'undefined' && item.startedTime !== undefined ? ('<time class="timeago started-time" datetime="' + item.startedTime + '"></time>') : '');
+                let startDate = (item.startDate !== 'undefined' && item.startDate !== undefined ? ('<time class="timeago start-date" datetime="' + item.startDate + '"></time>') : '');
+                let spanItem =
+
+                    `<span class="editable">${item.title}</span>`;
+                let dayDifference = get_time_diff(item.startDate);
+                let listItem = '<li>'
+                    + spanItem
+                    + `
+
+<time class="timeago start-time" datetime="$
+    {
+        item.createdTime
+    }
+"></time>`
+                    + (endTime !== "" ? endTime : startedTime)
+                    + startDate
+                    + ($("." + listId).hasClass("details-list") || $("." + listId).hasClass("archive-list") ? '' : '<i class="fa fa-archive" onclick="archiveParent(event);"></i>')
+                    + '<i class="fa fa-trash-o" onclick="removeParent(event);"></i></li>';
+
+
+                if (dayDifference === 1) {
+                    let currentList = 'tomorrow-list';
+                    $("." + currentList).append(listItem);
+                } else if (dayDifference > 1) {
+                    let currentList = 'upcoming-list';
+                    $("." + currentList).append(listItem);
+                } else {
+                    $("." + listId).append(listItem);
+                }
             });
-        });
+        })
+        ;
 
         $("time.timeago").timeago();
     }
@@ -338,8 +402,9 @@ function addTodoPanel() {
 
     $("#selectedTodo").append('<option selected value="' + name + '">' + name + '</option>');
 
-    reloadSelectedTodo();
     saveTodos();
+    reloadSelectedTodo();
+
 }
 
 function reloadRemote() {

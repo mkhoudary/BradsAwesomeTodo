@@ -86,7 +86,7 @@ section {
   padding: 5px;
 }
 .start-time:before {
-  content: "Added : ";
+  content: " Added : ";
   color: black;
 }
 img {
@@ -106,14 +106,19 @@ img {
   margin-right: 10px;
 }
 .started-time:before {
-  content: "Started : ";
+  content: " Started : ";
   color: black;
 }
 .done-time {
   margin-right: 10px;
 }
 .done-time:before {
-  content: "Done : ";
+  content: " Done : ";
+  color: black;
+}
+
+.start-date:before {
+  content: " Starting : ";
   color: black;
 }
 .in-progress-list {
