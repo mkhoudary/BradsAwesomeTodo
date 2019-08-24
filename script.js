@@ -172,7 +172,7 @@ $(document).ready(function () {
         if (!container.is(event.target) && container.has(event.target).length === 0 && container.is(":visible")) {
             let changedValue = container.val();
             let editable = container.parent().find('.editable');
-            if (changedValue != null && changedValue != '') {
+            if (cleanTaskTitle(changedValue) != null && cleanTaskTitle(changedValue) !== '') {
                 editable.text(changedValue);
                 let startDate = getStartDate(changedValue);
                 let time = '';
@@ -207,6 +207,8 @@ $(document).ready(function () {
                 return;
             }
             let value = $(this).val();
+            if (cleanTaskTitle(value) === '' || cleanTaskTitle(value) === null)
+                return;
             let startDate = getStartDate(value);
             const {hour, minute} = getTime(value);
 
@@ -341,6 +343,26 @@ function get_time_diff(datetime) {
     return days;
 }
 
+function cleanTaskTitle(title) {
+    let chunks = title.split(" ");
+    let weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    for (let i = 0; i < chunks.length; i++) {
+        let chunk = chunks[i];
+        if (chunk.match("^([0-9]|0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]|1[0-5]|[0-9])$")) {
+            title = title.replace(chunk, "");
+        }
+        for (let j = 0; j < weekDays.length; j++) {
+            let day = weekDays[j].toLowerCase();
+            chunk = chunk.toLowerCase();
+            if (chunk === day || chunk === day.substring(0, 3) || chunk === day.substring(0, 4)) {
+                title = title.replace(chunk, "");
+            }
+        }
+    }
+    return title;
+}
+
 function reloadSelectedTodo(externalContent) {
     $(".todo-list li:not(.input), .details-list li:not(.input)").remove();
 
@@ -367,9 +389,9 @@ function reloadSelectedTodo(externalContent) {
                 let startedTime = (item.startedTime !== 'undefined' && item.startedTime !== undefined ? ('<time class="timeago started-time" datetime="' + item.startedTime + '"></time>') : '');
                 let startDate = (item.startDate !== 'undefined' && item.startDate !== undefined ? ('<time class="timeago start-date" datetime="' + item.startDate + '"></time>') : '');
                 let time = (item.taskTime !== 'undefined' && item.taskTime !== undefined ? (`<time class="task-time" style="font-size:14px; color: red" datetime="${item.taskTime}">${item.taskTime}</time>`) : '');
+                let title = item.title !== 'undefined' && item.title !== undefined ? cleanTaskTitle(item.title) : '';
 
-
-                let spanItem = `<span class="editable">${item.title}</span>`;
+                let spanItem = `<span class="editable">${title}</span>`;
                 let dayDifference = get_time_diff(item.startDate);
                 let listItem = '<li>'
                     + time
@@ -380,8 +402,6 @@ function reloadSelectedTodo(externalContent) {
                     + ($("." + listId).hasClass("details-list") || $("." + listId).hasClass("archive-list") ? '' : '<i class="fa fa-archive" onclick="archiveParent(event);"></i>')
                     + '<i class="fa fa-trash-o" onclick="removeParent(event);"></i>'
                     + '</li>';
-
-
                 if (dayDifference === 1) {
                     let currentList = 'tomorrow-list';
                     $("." + currentList).append(listItem);
