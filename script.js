@@ -130,9 +130,13 @@ $(document).ready(function () {
             let chunk = chunks[i];
             //13:00 or 1:00 or 5:05 or 5:5
             if (chunk.match("^([0-9]|0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]|1[0-5]|[0-9])$")) {
-                let chunkSplits = chunk.split(":");
-                hour = (parseInt(chunkSplits[0]));
-                minute = (parseInt(chunkSplits[1]));
+                let prevChunk = chunks[i - 1];
+                if (prevChunk !== undefined && prevChunk.trim() === 'at') {
+                    console.log(chunk);
+                    let chunkSplits = chunk.split(":");
+                    hour = (parseInt(chunkSplits[0]));
+                    minute = (parseInt(chunkSplits[1]));
+                }
             }
         }
         return {hour: hour, minute: minute};
@@ -160,7 +164,10 @@ $(document).ready(function () {
             for (let j = 0; j < weekDays.length; j++) {
                 let day = weekDays[j].toLowerCase();
                 if (chunk === day || chunk === day.substring(0, 3) || chunk === day.substring(0, 4)) {
-                    return d.getDate() + (7 + j - d.getDay()) % 7;
+                    let prevChunk = chunks[i - 1];
+                    if (prevChunk !== undefined && prevChunk.trim() === 'on') {
+                        return d.getDate() + (7 + j - d.getDay()) % 7;
+                    }
                 }
             }
         }
@@ -358,13 +365,21 @@ function cleanTaskTitle(title) {
     for (let i = 0; i < chunks.length; i++) {
         let chunk = chunks[i];
         if (chunk.match("^([0-9]|0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]|1[0-5]|[0-9])$")) {
-            title = title.replace(chunk, "");
+            let prevChunk = chunks[i - 1];
+            if (prevChunk !== undefined && prevChunk.trim() === 'at') {
+                title = title.replace('at', "");
+                title = title.replace(chunk, "");
+            }
         }
         for (let j = 0; j < weekDays.length; j++) {
             let day = weekDays[j].toLowerCase();
             chunk = chunk.toLowerCase();
             if (chunk === day || chunk === day.substring(0, 3) || chunk === day.substring(0, 4)) {
-                title = title.replace(chunk, "");
+                let prevChunk = chunks[i - 1];
+                if (prevChunk !== undefined && prevChunk.trim() === 'on') {
+                    title = title.replace('on', "");
+                    title = title.replace(chunk, "");
+                }
             }
         }
     }
