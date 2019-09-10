@@ -88,7 +88,6 @@ $(document).ready(function () {
         receive: function (event, ui) {
             ui.item.find(".done-time").remove();
             ui.item.find(".start-date").remove();
-
             saveDetails();
         },
         stop: function () {
@@ -96,16 +95,13 @@ $(document).ready(function () {
         }
     });
 
-
     $(".in-progress-list").sortable({
         'connectWith': '.todo-list',
         receive: function (event, ui) {
             ui.item.find(".done-time, .started-time").remove();
             ui.item.find(".start-date").remove();
-
             ui.item.find("time:first-of-type").before('<time class="timeago started-time" datetime="' + new Date().toISOString() + '"></time>');
             $("time.timeago").timeago();
-
             saveDetails();
         },
         stop: function () {
@@ -200,14 +196,18 @@ $(document).ready(function () {
                     editable.after(`<time class="timeago start-date" datetime="${startDate.toISOString()}"></time>${time}`);
                 }
             }
-            editable.parent().find(":not(input)").removeClass('hidden');
-            container.remove();
             saveDetails();
             reloadSelectedTodo();
+
+            editable.parent().find(":not(input)").removeClass('hidden');
+            container.remove();
         }
     };
+
+    //When click outside editable todo's label
     $('body').on('mouseup keypress', function (event) {
-        if (event.type == 'mouseup' || event.type == 'keypress' && event.which == 13) detectEditableInputChange(event);
+        if (event.type === 'mouseup' || (event.type === 'keypress' && event.which === 13))
+            detectEditableInputChange(event);
     });
 
     $(".task-input").on("keydown", function (event) {
@@ -217,9 +217,9 @@ $(document).ready(function () {
             let value = $(this).val();
             if (cleanTaskTitle(value) === '' || cleanTaskTitle(value) === null)
                 return;
+
             let startDate = getStartDate(value);
             const {hour, minute} = getTime(value);
-
             let time = '';
             if (hour > -1 && minute > -1) {
                 const tempDate = new Date();
@@ -341,11 +341,8 @@ function get_time_diff(datetime) {
             return "";
         }
         let milisec_diff = datetime - now;
-        if (datetime < now) {
-            milisec_diff = now - datetime;
-        }
-        days = Math.floor(milisec_diff / 1000 / 60 / (60 * 24));
-        let hours = Math.round(milisec_diff / 1000 / 60 / (60));
+        days = Math.ceil(milisec_diff / 86400000);
+        let hours = Math.ceil(milisec_diff / 1000 / 60 / (60));
         days = days === 0 && hours === 24 ? 1 : days;
     }
     return days;
@@ -428,6 +425,7 @@ function reloadSelectedTodo(externalContent) {
                     + ($("." + listId).hasClass("details-list") || $("." + listId).hasClass("archive-list") ? '' : '<i class="fa fa-archive" onclick="archiveParent(event);"></i>')
                     + '<i class="fa fa-trash-o" onclick="removeParent(event);"></i>'
                     + '</li>';
+                console.log(title, dayDifference);
                 if (dayDifference === 1) {
                     let currentList = 'tomorrow-list';
                     $("." + currentList).append(listItem);
