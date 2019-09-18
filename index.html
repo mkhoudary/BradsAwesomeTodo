@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Brad's Awesome Todo</title>
     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
@@ -19,29 +20,37 @@
     <button onclick="removeTodoPanel();">&#xE15B;</button>
     <input id="remoteAddress" type="text" placeholder="Remote storage id"/>
 </header>
+
 <h1><img height="35" src="https://image.ibb.co/eo4OKG/brad.jpg" alt=""/> <i class="material-icons flipped">&#xE244;</i>If
     you're thinking that this tool will solve the problem, it means you're not really aware of what the problem is..<i
             class="material-icons">&#xE244;</i> <em>Brad McEvoy. Circa 2018</em></h1>
-<section id="todo-list">
-    <ul class="pending-list todo-list" data-list-name="pending-list" title="Todays Todo">
-        <li class="input">
-            <input type="text" class="task-input" placeholder="What are you going to do?"/>
-        </li>
-    </ul>
-    <ul class="todo-list tomorrow-list" title="Tomorrows Todo" data-list-name="tomorrow-list">
-        <li class="input">
-            <input type="text" class="task-input" placeholder="What are you going to do?"/>
-        </li>
-    </ul>
-    <ul class="todo-list upcoming-list" title="Upcoming Todo" data-list-name="upcoming-list">
-        <li class="input">
-            <input type="text" class="task-input" placeholder="What's upcoming?"/>
-        </li>
-    </ul>
-    <ul class="todo-list archive-list" title="Archive List" data-list-name="archive-list">
-    </ul>
-</section>
-<section>
+<div class="continer-fluid">
+    <div class="row">
+        <div class="col-offset-6 col-md-6">
+             <section id="todo-list">
+                <ul class="pending-list todo-list" data-list-name="pending-list" title="Todays Todo">
+                    <li class="input">
+                        <input type="text" class="task-input" placeholder="What are you going to do?"/>
+                    </li>
+                </ul>
+                <!-- <ul class="todo-list tomorrow-list" title="Tomorrows Todo" data-list-name="tomorrow-list">
+                    <li class="input">
+                        <input type="text" class="task-input" placeholder="What are you going to do?"/>
+                    </li>
+                </ul>
+                <ul class="todo-list upcoming-list" title="Upcoming Todo" data-list-name="upcoming-list">
+                    <li class="input">
+                        <input type="text" class="task-input" placeholder="What's upcoming?"/>
+                    </li>
+                </ul>
+                <ul class="todo-list archive-list" title="Archive List" data-list-name="archive-list">
+                </ul> -->
+            </section>
+        </div>
+    </div>    
+</div>
+
+<!-- <section>
     <ul class="todo-list in-progress-list" title="In Progress List" data-list-name="in-progress-list">
     </ul>
     <ul class="todo-list done-list" title="Done List" data-list-name="done-list">
@@ -63,6 +72,7 @@
         </li>
     </ul>
 </section>
+ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" type="text/javascript"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.6.1/jquery.timeago.min.js"
         type="text/javascript"></script>
