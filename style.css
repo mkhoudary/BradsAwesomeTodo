@@ -247,3 +247,9 @@ img {
 .details-list li input:focus {
   border-color: gray;
 }
+
+
+
+.container-fluid {
+  width: 80%;
+}

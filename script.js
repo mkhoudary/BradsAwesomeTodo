@@ -405,9 +405,9 @@ function reloadSelectedTodo(externalContent) {
 
         $.each(memoryItems, function (listId, list) {
             $.each(list, function (key, item) {
-                let endTime = (item.endTime !== 'undefined' && item.endTime !== undefined ? ('<time class="timeago done-time" datetime="' + item.endTime + '"></time>') : '');
-                let startedTime = (item.startedTime !== 'undefined' && item.startedTime !== undefined ? ('<time class="timeago started-time" datetime="' + item.startedTime + '"></time>') : '');
-                let startDate = (item.startDate !== 'undefined' && item.startDate !== undefined ? ('<time class="timeago start-date" datetime="' + item.startDate + '"></time>') : '');
+                let endTime = (item.endTime !== 'undefined' && item.endTime !== undefined ? ('<time class="timeago done-time hidden" datetime="' + item.endTime + '"></time>') : '');
+                let startedTime = (item.startedTime !== 'undefined' && item.startedTime !== undefined ? ('<time class="timeago started-time hidden" datetime="' + item.startedTime + '"></time>') : '');
+                let startDate = (item.startDate !== 'undefined' && item.startDate !== undefined ? ('<time class="timeago start-date hidden" datetime="' + item.startDate + '"></time>') : '');
                 let title = item.title !== 'undefined' && item.title !== undefined ? cleanTaskTitle(item.title) : '';
 
 
@@ -419,13 +419,12 @@ function reloadSelectedTodo(externalContent) {
                 let listItem = '<li>'
                     + time
                     + spanItem
-                    + `<time class="timeago start-time" datetime="${item.createdTime}"></time>`
+                    + `<time class="timeago start-time hidden" datetime="${item.createdTime}"></time>`
                     + (endTime !== "" ? endTime : startedTime)
                     + startDate
                     + ($("." + listId).hasClass("details-list") || $("." + listId).hasClass("archive-list") ? '' : '<i class="fa fa-archive" onclick="archiveParent(event);"></i>')
                     + '<i class="fa fa-trash-o" onclick="removeParent(event);"></i>'
                     + '</li>';
-                console.log(title, dayDifference);
                 if (dayDifference === 1) {
                     let currentList = 'tomorrow-list';
                     $("." + currentList).append(listItem);
